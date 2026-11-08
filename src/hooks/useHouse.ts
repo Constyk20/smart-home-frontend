@@ -44,7 +44,7 @@ export function useHouse(houseId: string) {
   const [schedules, setSchedules] = useState<ScheduleSummary[]>([]);
   const [error, setError] = useState("");
   const [loaded, setLoaded] = useState(false);
-  const [connection, setConnection] = useState<Connection>("connecting");
+  const [connection] = useState<Connection>("connecting");
   const [activityVersion, setActivityVersion] = useState(0);
   const [pending, setPending] = useState<ReadonlySet<string>>(new Set());
   const loadRef = useRef<() => Promise<void>>(async () => undefined);
