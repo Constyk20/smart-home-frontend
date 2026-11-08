@@ -103,7 +103,7 @@ export function useHouse(houseId: string) {
     const token = localStorage.getItem("access_token");
     if (!token || !houseId) return;
 
-    const socket = new WebSocket(`ws://127.0.0.1:8000/ws/houses/${houseId}?token=${encodeURIComponent(token)}`);
+    const socket = new WebSocket(`ws://smart-home-backend-e9zs.onrender.com/ws/houses/${houseId}?token=${encodeURIComponent(token)}`);
     socket.onopen = () => setConnection("live");
     socket.onclose = () => setConnection("offline");
     socket.onerror = () => setConnection("offline");
