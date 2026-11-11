@@ -23,17 +23,28 @@ function set(next: WakeStatus) {
   listeners.forEach((listener) => listener());
 }
 
+/**
+ * True once the server answers. A normal request is tried first. If the browser blocks the
+ * reply (the backend's CORS list does not include this site yet), a second "no-cors" request
+ * still tells us the server is awake, because it only needs the request to get through.
+ */
 async function ping(): Promise<boolean> {
-  const controller = new AbortController();
-  const timer = window.setTimeout(() => controller.abort(), TRY_TIMEOUT_MS);
-  try {
-    const response = await fetch(`${API_ORIGIN}/health`, { signal: controller.signal, cache: "no-store" });
-    return response.ok;
-  } catch {
-    return false;
-  } finally {
-    window.clearTimeout(timer);
+  const url = `${API_ORIGIN}/health`;
+  for (const mode of ["cors", "no-cors"] as const) {
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => controller.abort(), TRY_TIMEOUT_MS);
+    try {
+      const response = await fetch(url, { signal: controller.signal, cache: "no-store", mode });
+      if (mode === "no-cors") return true; // opaque reply: the server is reachable
+      if (response.ok) return true;
+      return false; // a real error status (for example 502 while waking): keep waiting
+    } catch {
+      // network failure, timeout, or CORS block: fall through to the next mode
+    } finally {
+      window.clearTimeout(timer);
+    }
   }
+  return false;
 }
 
 async function run(id: number) {
