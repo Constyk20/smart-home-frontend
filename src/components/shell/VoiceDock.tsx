@@ -1,25 +1,21 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { VoicePanel } from "../VoicePanel";
 import { Icon } from "../ui/Icon";
-import type { Device } from "../../types";
+import type { VoiceApi } from "../../hooks/useVoice";
 
 type Props = {
-  devices: Device[];
-  onChanged: () => Promise<void> | void;
+  voice: VoiceApi;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  listening: boolean;
-  onListeningChange: (listening: boolean) => void;
 };
 
 /**
- * Header microphone button that opens the existing VoicePanel in a popover.
- * The panel stays mounted while closed, so a command in progress is not cut off.
- * Open and listening state live in the page so the Home AI orb can open it too.
+ * Header microphone button that opens the VoicePanel (with the typed-command box) in a popover.
+ * The Home AI orb listens directly and shares the same `voice` engine.
  */
-export function VoiceDock({ devices, onChanged, open, onOpenChange, listening, onListeningChange }: Props) {
+export function VoiceDock({ voice, open, onOpenChange }: Props) {
   const wrapper = useRef<HTMLDivElement>(null);
-  const handleListening = useCallback((value: boolean) => onListeningChange(value), [onListeningChange]);
+  const { listening } = voice;
 
   useEffect(() => {
     if (!open) return;
@@ -53,7 +49,7 @@ export function VoiceDock({ devices, onChanged, open, onOpenChange, listening, o
         <span className="sr-only sm:hidden">Voice</span>
       </button>
       <div id="voice-popover" hidden={!open} className="anim-fade absolute right-0 top-full z-40 mt-2 w-[min(92vw,24rem)] shadow-xl">
-        <VoicePanel devices={devices} onChanged={onChanged} onListeningChange={handleListening} />
+        <VoicePanel voice={voice} />
       </div>
     </div>
   );

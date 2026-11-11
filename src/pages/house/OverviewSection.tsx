@@ -89,7 +89,7 @@ export function OverviewSection(props: SectionProps) {
           <HomeAiCard
             houseId={houseId}
             refreshKey={house.activityVersion}
-            listening={props.listening}
+            voice={props.voice}
             onOpenVoice={props.onOpenVoice}
             onOpenDetails={() => props.onNavigate("automations")}
           />

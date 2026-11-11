@@ -9,6 +9,7 @@ import { AppShell, SECTIONS, type SectionId } from "../components/shell/AppShell
 import { VoiceDock } from "../components/shell/VoiceDock";
 import { useCurrentUser } from "../hooks/useCurrentUser";
 import { useHouse } from "../hooks/useHouse";
+import { useVoice } from "../hooks/useVoice";
 import type { Device } from "../types";
 import { AutomationsSection } from "./house/AutomationsSection";
 import { DevicesSection } from "./house/DevicesSection";
@@ -35,7 +36,7 @@ export function HousePage() {
   const [focus, setFocus] = useState<SceneFocus | null>(null);
   const [openDeviceId, setOpenDeviceId] = useState("");
   const [voiceOpen, setVoiceOpen] = useState(false);
-  const [listening, setListening] = useState(false);
+  const voice = useVoice(house.devices, house.load);
 
   // Keep a valid room selected as rooms load, are added or are deleted.
   useEffect(() => {
@@ -130,7 +131,7 @@ export function HousePage() {
     onResetFocus: resetFocus,
     onNavigate: navigate,
     onOpenCategory: openCategory,
-    listening,
+    voice,
     onOpenVoice: openVoice,
     automated,
     roomNames,
@@ -149,14 +150,7 @@ export function HousePage() {
           attention={attention}
           onOpenAttention={() => navigate("security")}
           voice={
-            <VoiceDock
-              devices={house.devices}
-              onChanged={house.load}
-              open={voiceOpen}
-              onOpenChange={setVoiceOpen}
-              listening={listening}
-              onListeningChange={setListening}
-            />
+            <VoiceDock voice={voice} open={voiceOpen} onOpenChange={setVoiceOpen} />
           }
         />
       }

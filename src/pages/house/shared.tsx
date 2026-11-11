@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "react";
 import { DeviceCard } from "../../components/DeviceCard";
 import { Icon } from "../../components/ui/Icon";
 import { SCENES } from "../../lib/scenes";
+import type { VoiceApi } from "../../hooks/useVoice";
 import type { HouseData } from "../../hooks/useHouse";
 import type { SceneFocus } from "../../components/HouseScene";
 import type { SectionId } from "../../components/shell/AppShell";
@@ -21,7 +22,7 @@ export type SectionProps = {
   onResetFocus: () => void;
   onNavigate: (section: SectionId) => void;
   onOpenCategory: (category: Category) => void;
-  listening: boolean;
+  voice: VoiceApi;
   onOpenVoice: () => void;
   automated: ReadonlySet<string>;
   roomNames: ReadonlyMap<string, string>;
