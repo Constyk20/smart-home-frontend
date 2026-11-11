@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api, errorMessage, type House } from "../api";
+import { api, errorMessage, WS_ORIGIN, type House } from "../api";
 import { isOpening } from "../lib/devices";
 import type {
   Connection,
@@ -44,7 +44,7 @@ export function useHouse(houseId: string) {
   const [schedules, setSchedules] = useState<ScheduleSummary[]>([]);
   const [error, setError] = useState("");
   const [loaded, setLoaded] = useState(false);
-  const [connection] = useState<Connection>("connecting");
+  const [connection, setConnection] = useState<Connection>("connecting");
   const [activityVersion, setActivityVersion] = useState(0);
   const [pending, setPending] = useState<ReadonlySet<string>>(new Set());
   const loadRef = useRef<() => Promise<void>>(async () => undefined);
@@ -103,9 +103,11 @@ export function useHouse(houseId: string) {
     const token = localStorage.getItem("access_token");
     if (!token || !houseId) return;
 
-   const socket = new WebSocket(
-  `wss://smart-home-backend-e9zs.onrender.com/ws/houses/${houseId}?token=${encodeURIComponent(token)}`,
-);
+    const socket = new WebSocket(`${WS_ORIGIN}/ws/houses/${houseId}?token=${encodeURIComponent(token)}`);
+    socket.onopen = () => setConnection("live");
+    socket.onclose = () => setConnection("offline");
+    socket.onerror = () => setConnection("offline");
+
     socket.onmessage = (message) => {
       const event = JSON.parse(message.data) as SocketEvent;
 
