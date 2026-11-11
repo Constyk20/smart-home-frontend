@@ -26,6 +26,15 @@ export function ServerStatus() {
     );
   }
 
+  if (status === "slow") {
+    return (
+      <div role="status" className="mt-4 flex items-start gap-3 rounded-lg bg-brand-soft px-4 py-3 text-sm text-brand-ink">
+        <Spinner className="mt-0.5 h-4 w-4 shrink-0" />
+        <span>The server is taking longer than usual. You can try signing in now, and it will keep trying in the background.</span>
+      </div>
+    );
+  }
+
   return (
     <div role="status" className="mt-4 flex items-start gap-3 rounded-lg bg-brand-soft px-4 py-3 text-sm text-brand-ink">
       <Spinner className="mt-0.5 h-4 w-4 shrink-0" />

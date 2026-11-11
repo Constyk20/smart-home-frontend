@@ -6,10 +6,11 @@ import { API_ORIGIN } from "../api";
  * request can take a minute. We ping the server's /health as soon as the site opens,
  * so it is usually awake by the time someone finishes typing their password.
  */
-export type WakeStatus = "waking" | "ready" | "failed";
+export type WakeStatus = "waking" | "slow" | "ready" | "failed";
 
 const TRY_TIMEOUT_MS = 12_000;
 const RETRY_DELAY_MS = 3_000;
+const SLOW_AFTER_MS = 15_000;
 const GIVE_UP_AFTER_MS = 120_000;
 
 let status: WakeStatus = "waking";
@@ -54,10 +55,13 @@ async function run(id: number) {
       if (id === attempt) set("ready");
       return;
     }
-    if (Date.now() - startedAt > GIVE_UP_AFTER_MS) {
+    const waited = Date.now() - startedAt;
+    if (waited > GIVE_UP_AFTER_MS) {
       if (id === attempt) set("failed");
       return;
     }
+    // After a while stop blocking the form: signing in is allowed to try for itself.
+    if (waited > SLOW_AFTER_MS && id === attempt) set("slow");
     await new Promise((resolve) => window.setTimeout(resolve, RETRY_DELAY_MS));
   }
 }
